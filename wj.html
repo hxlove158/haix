@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#FF6B8B">
+    <title>我们的恋爱时光</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        love: {
+                            pink: '#FF6B8B',
+                            purple: '#8A2BE2',
+                            gold: '#FFD700',
+                            light: 'rgb(255, 240, 243)',
+                            dark: '#333333'
+                        }
+                    },
+                    fontFamily: {
+                        handwriting: ['Segoe Script', 'Brush Script MT', 'cursive'],
+                        serif: ['Georgia', 'Cambria', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        'heartbeat': 'heartbeat 1.5s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        heartbeat: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.1)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+            .bg-cover-fixed {
+                background-attachment: fixed;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+            @media (max-width: 768px) {
+                .bg-cover-fixed {
+                    background-attachment: scroll;
+                }
+            }
+        }
+    </style>
+    
+    <style>
+        body {
+            background-image: url('../video/1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* 平滑滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 107, 139, 0.5);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 音乐按钮动画 */
+        .music-toggle {
+            transition: all 0.3s ease;
+        }
+        .music-toggle:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+    </style>
+</head>
+<body class="font-sans bg-love-light">
+ 
+    <!-- 主容器 -->
+    <div class="relative min-h-screen flex flex-col items-center justify-center p-4 z-10">
+
+        <!-- 头部标题区 -->
+        <header class="text-center mb-6 md:mb-10 animate-fade-in">
+            <h1 id="mainTitle" class="text-[clamp(1.8rem,8vw,4.5rem)] font-handwriting font-bold text-love-pink text-shadow leading-tight">
+                侯松伟和夏文娟的恋爱时光
+            </h1>
+            <p id="subTitle" class="text-[clamp(1rem,4vw,2.5rem)] font-bold mt-2 text-love-dark/80 animate-fade-in" style="animation-delay: 0.2s">
+                记录着每一刻与你的心动
+            </p>
+        </header>
+
+        <!-- 倒计时显示区 -->
+        <div class="w-full max-w-3xl mx-auto bg-white/70 bg-blur rounded-2xl shadow-xl p-5 md:p-8 animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex flex-col md:flex-row justify-around items-center gap-6">
+                <!-- 正计时显示 -->
+                <div class="text-center">
+                    <div id="h1" class="text-[clamp(2.2rem,12vw,5rem)] font-bold text-love-purple animate-pulse-slow">0</div>
+                    <div class="text-gray-500 text-sm md:text-base">相爱</div>
+                </div>
+                
+                <!-- 分隔符 -->
+                <div class="hidden md:block h-20 w-px bg-gray-300"></div>
+                
+                <!-- 倒计时显示 -->
+                <div class="grid grid-cols-4 gap-1 md:gap-3 w-full md:w-auto px-2">
+                    <div class="text-center">
+                        <div id="countdownDays" class="text-[clamp(1.5rem,7vw,2.5rem)] font-bold text-love-pink">00</div>
+                        <div class="text-xs md:text-sm text-gray-500">天</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="countdownHours" class="text-[clamp(1.5rem,7vw,2.5rem)] font-bold text-love-pink">00</div>
+                        <div class="text-xs md:text-sm text-gray-500">时</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="countdownMinutes" class="text-[clamp(1.5rem,7vw,2.5rem)] font-bold text-love-pink">00</div>
+                        <div class="text-xs md:text-sm text-gray-500">分</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="countdownSeconds" class="text-[clamp(1.5rem,7vw,2.5rem)] font-bold text-love-pink">00</div>
+                        <div class="text-xs md:text-sm text-gray-500">秒</div>
+                    </div>
+                </div>
+            </div>   
+        </div>
+    </div>
+
+    <!-- 背景音乐 -->
+    <audio id="bgmusic" src="./wj/video/v.mp3" loop preload="auto" style="display: none;">
+    </audio>
+
+    <!-- 音乐控制按钮 -->
+    <button id="musicToggle" class="music-toggle fixed bottom-5 right-5 w-12 h-12 bg-love-pink text-white rounded-full shadow-lg flex items-center justify-center z-50">
+        <i class="fa fa-music text-xl"></i>
+    </button>
+
+    <script>
+        // 倒计时逻辑（兼容iOS和Android）
+        (function() {
+            // 核心修复1：使用全平台兼容的日期格式和解析方法
+            const config = {
+                targetDate: '2025-10-29', // 用 '-' 分隔，兼容所有设备
+                elements: {
+                    day: document.getElementById('countdownDays'),
+                    hour: document.getElementById('countdownHours'),
+                    minute: document.getElementById('countdownMinutes'),
+                    second: document.getElementById('countdownSeconds'),
+                    totalDay: document.getElementById('h1')
+                }
+            };
+
+            let timer = null;
+
+            // 核心修复2：手动解析日期（避免不同浏览器解析差异）
+            function parseDate(dateStr) {
+                const parts = dateStr.split('-');
+                // 月份从0开始，手动减1（iOS必须）
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+
+            // 计算时间差
+            function calculateTimeDiff(targetTime) {
+                const nowTime = new Date().getTime();
+                const msec = nowTime - targetTime;
+                const totalSeconds = Math.floor(msec / 1000);
+
+                // 处理目标日期在未来的情况（避免负数）
+                if (totalSeconds < 0) {
+                    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+                }
+
+                return {
+                    days: Math.floor(totalSeconds / 86400),
+                    hours: Math.floor((totalSeconds % 86400) / 3600),
+                    minutes: Math.floor((totalSeconds % 3600) / 60),
+                    seconds: totalSeconds % 60
+                };
+            }
+
+            // 更新DOM显示
+            function updateCountdown() {
+                try {
+                    const targetDate = parseDate(config.targetDate);
+                    const targetTime = targetDate.getTime();
+                    const { days, hours, minutes, seconds } = calculateTimeDiff(targetTime);
+
+                    // 统一更新所有元素
+                    if (config.elements.totalDay) config.elements.totalDay.textContent = days;
+                    if (config.elements.day) config.elements.day.textContent = formatNumber(days);
+                    if (config.elements.hour) config.elements.hour.textContent = formatNumber(hours);
+                    if (config.elements.minute) config.elements.minute.textContent = formatNumber(minutes);
+                    if (config.elements.second) config.elements.second.textContent = formatNumber(seconds);
+                } catch (error) {
+                    console.error('更新时器错误:', error);
+                    // 错误时重启定时器（应对设备休眠后定时器失效）
+                    if (timer) clearInterval(timer);
+                    init();
+                }
+            }
+
+            // 数字格式化
+            function formatNumber(num) {
+                return num < 10 ? `0${num}` : num;
+            }
+
+            // 初始化函数
+            function init() {
+                updateCountdown(); // 立即执行一次
+                // 核心修复3：使用setTimeout递归代替setInterval（避免设备休眠后定时器偏差）
+                timer = setTimeout(function updateLoop() {
+                    updateCountdown();
+                    timer = setTimeout(updateLoop, 1000);
+                }, 1000);
+            }
+
+            // 核心修复4：确保DOM加载完成后初始化（兼容不同设备的加载时机）
+            function safeInit() {
+                if (document.readyState === 'complete') {
+                    init();
+                } else {
+                    window.addEventListener('load', init);
+                    document.addEventListener('DOMContentLoaded', init);
+                }
+            }
+
+            // 核心修复5：处理设备休眠/页面隐藏后的数据同步问题
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    // 页面重新显示时立即更新一次
+                    updateCountdown();
+                }
+            });
+
+            // 页面卸载时清理
+            window.addEventListener('unload', () => {
+                if (timer) clearTimeout(timer);
+            });
+
+            // 启动初始化
+            safeInit();
+        })();
+
+        // 音乐控制逻辑（兼容全平台）
+        document.addEventListener('DOMContentLoaded', function() {
+            const music = document.getElementById('bgmusic');
+            const toggleBtn = document.getElementById('musicToggle');
+            let isPlaying = false;
+
+            // 播放/暂停切换
+            function togglePlay() {
+                if (isPlaying) {
+                    music.pause();
+                    toggleBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+                } else {
+                    music.play().then(() => {
+                        toggleBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+                    }).catch(err => {
+                        console.log('播放需要用户交互:', err);
+                        toggleBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+                    });
+                }
+                isPlaying = !isPlaying;
+            }
+
+            // 绑定按钮点击（必须用户主动交互才能播放）
+            toggleBtn.addEventListener('click', togglePlay);
+
+            // 核心修复：监听首次用户交互（解决iOS/Android自动播放限制）
+            function handleFirstInteraction() {
+                if (music.paused) {
+                    music.play().catch(() => {}); // 尝试播放，失败不处理
+                }
+                // 移除监听，只触发一次
+                document.removeEventListener('click', handleFirstInteraction);
+                document.removeEventListener('touchstart', handleFirstInteraction);
+            }
+
+            // 监听点击和触摸事件（覆盖鼠标和触屏设备）
+            document.addEventListener('click', handleFirstInteraction, { once: true });
+            document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+        });
+    </script>
+</body>
+</html>
