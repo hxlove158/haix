@@ -105,41 +105,86 @@
         })();
 
         // 音乐控制逻辑（兼容全平台）
-        document.addEventListener('DOMContentLoaded', function() {
+       document.addEventListener('DOMContentLoaded', function() {
             const music = document.getElementById('bgmusic');
             const toggleBtn = document.getElementById('musicToggle');
             let isPlaying = false;
 
-            // 播放/暂停切换
+            // 1. 解决格式兼容：检测浏览器支持的音频格式
+            function checkAudioSupport() {
+                const canPlayMp3 = music.canPlayType('audio/mpeg') !== '';
+                const canPlayOgg = music.canPlayType('audio/ogg') !== '';
+                
+                // 日志用于调试（可删除）
+                console.log('MP3支持:', canPlayMp3, 'OGG支持:', canPlayOgg);
+            }
+            checkAudioSupport();
+
+            // 2. 统一播放/暂停逻辑
             function togglePlay() {
                 if (isPlaying) {
                     music.pause();
-                    toggleBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+                    toggleBtn.innerHTML = '<i class="fa fa-music text-xl"></i>';
+                    toggleBtn.classList.add('music-pulse'); // 未播放时显示脉冲动画
                 } else {
+                    // 播放时移除脉冲动画，添加播放状态反馈
                     music.play().then(() => {
                         toggleBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+                        toggleBtn.classList.remove('music-pulse');
                     }).catch(err => {
-                        console.log('播放需要用户交互:', err);
-                        toggleBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+                        console.log('播放失败（需要用户交互）:', err);
+                        // 失败时保持播放按钮状态，引导用户再次点击
+                        toggleBtn.innerHTML = '<i class="fa fa-music text-xl"></i>';
                     });
                 }
                 isPlaying = !isPlaying;
             }
 
-            // 绑定按钮点击（必须用户主动交互才能播放）
+            // 3. 绑定按钮点击（必须由用户主动触发，兼容iOS/安卓限制）
             toggleBtn.addEventListener('click', togglePlay);
 
-            // 核心修复：监听首次用户交互（解决iOS/Android自动播放限制）
+            // 4. 处理首次交互触发（关键！解决自动播放限制）
             function handleFirstInteraction() {
+                // 首次点击页面任意位置时尝试播放
                 if (music.paused) {
-                    music.play().catch(() => {}); // 尝试播放，失败不处理
+                    music.play().catch(() => {
+                        // 失败不报错，等待用户点击音乐按钮
+                    });
                 }
-                // 移除监听，只触发一次
+                // 只触发一次，避免重复执行
                 document.removeEventListener('click', handleFirstInteraction);
                 document.removeEventListener('touchstart', handleFirstInteraction);
             }
 
-            // 监听点击和触摸事件（覆盖鼠标和触屏设备）
+            // 同时监听点击和触摸事件，覆盖所有设备
             document.addEventListener('click', handleFirstInteraction, { once: true });
             document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+
+            // 5. 适配页面可见性变化（解决切后台后暂停问题）
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // 页面隐藏时暂停播放（部分浏览器会自动暂停）
+                    if (isPlaying) {
+                        music.pause();
+                        isPlaying = false;
+                        toggleBtn.innerHTML = '<i class="fa fa-music text-xl"></i>';
+                        toggleBtn.classList.add('music-pulse');
+                    }
+                }
+            });
+
+            // 6. 低电量模式适配（iOS特有）
+            if ('connection' in navigator) {
+                navigator.connection.addEventListener('change', () => {
+                    if (navigator.connection.saveData) {
+                        // 节能模式下自动暂停
+                        if (isPlaying) {
+                            music.pause();
+                            isPlaying = false;
+                            toggleBtn.innerHTML = '<i class="fa fa-music text-xl"></i>';
+                            toggleBtn.classList.add('music-pulse');
+                        }
+                    }
+                });
+            }
         });
